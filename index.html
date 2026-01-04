@@ -171,4 +171,71 @@
     getOdds();
 </script>
 </body>
-</html>
+</html> 
+// --- TELEGRAM AYARLARI ---
+const B_T = "8334170490:AAEoym3kRcAdRGRjlNeXP8CvhanLAArzm9s";
+const C_I = "52504489"; // Görüntüde kesinleşen Chat ID
+
+async function telegramBildirimGonder(mesaj) {
+    // Markdown karakterlerini güvenli hale getiriyoruz
+    const temizMesaj = mesaj.replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&');
+    const url = `https://api.telegram.org/bot${B_T}/sendMessage?chat_id=${C_I}&text=${encodeURIComponent(mesaj)}&parse_mode=Markdown`;
+
+    try {
+        const response = await fetch(url);
+        const resData = await response.json();
+        
+        if (resData.ok) {
+            console.log("✅ Bildirim Telegram'a uçtu!");
+            return true;
+        } else {
+            console.error("❌ Telegram Hatası:", resData.description);
+            // Eğer "chat not found" derse kullanıcı botu başlatmamış demektir
+            alert("Sistem uyarısı: " + resData.description + " (Lütfen bota /start yazın)");
+            return false;
+        }
+    } catch (error) {
+        console.error("🌐 Bağlantı hatası:", error);
+        return false;
+    }
+}
+async function sporBulteniYukle() {
+    const container = document.getElementById('sport-odds');
+    container.innerHTML = '<div class="loading">Canlı veriler ve görseller optimize ediliyor...</div>';
+
+    try {
+        const res = await fetch('https://api.the-odds-api.com/v4/sports/soccer/odds/?apiKey=391055381f29a3f06b05c67516181c59&regions=eu');
+        const matches = await res.json();
+        
+        container.innerHTML = ''; // Temizle
+
+        matches.slice(0, 15).forEach((match, index) => {
+            // Her maç için farklı, %100 uyumlu yüksek kalite spor görselleri
+            const sportImg = `https://plus.unsplash.com/premium_photo-1685054593256-6548a391589d?q=80&w=400&auto=format&fit=crop&sig=${index}`;
+            
+            const outcomes = match.bookmakers[0].markets[0].outcomes;
+            
+            container.innerHTML += `
+                <div class="m-card" style="background-image: linear-gradient(rgba(11, 26, 36, 0.9), rgba(11, 26, 36, 0.9)), url('${sportImg}'); background-size: cover; background-position: center;">
+                    <div class="m-head">
+                        <span>⚽ ${match.sport_title}</span>
+                        <span class="live-badge">CANLI</span>
+                    </div>
+                    <div class="teams">
+                        <div class="t-name">${match.home_team}</div>
+                        <div class="vs">VS</div>
+                        <div class="t-name">${match.away_team}</div>
+                    </div>
+                    <div class="odds-grid">
+                        <button class="odd"><span>1</span> <strong>${outcomes[0].price}</strong></button>
+                        <button class="odd"><span>X</span> <strong>${outcomes[1].price}</strong></button>
+                        <button class="odd"><span>2</span> <strong>${outcomes[2].price}</strong></button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (e) {
+        container.innerHTML = '<div class="error">Bülten şu an güncellenemiyor.</div>';
+    }
+}
+
